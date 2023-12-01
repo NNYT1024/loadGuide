@@ -6,6 +6,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.kakao.vectormap.KakaoMap
+import com.kakao.vectormap.KakaoMap.OnViewportChangeListener
 import com.kakao.vectormap.KakaoMapReadyCallback
 import com.kakao.vectormap.LatLng
 import com.kakao.vectormap.MapLifeCycleCallback
@@ -126,9 +127,21 @@ class MainActivity : AppCompatActivity() {
                 val options = RouteLineOptions.from(segment).setStylesSet(stylesSet)
 
                 // 5. RouteLineLayer 에 추가하여 RouteLine 생성하기
-
                 val routeLine = layer.addRouteLine(options)
+
+                /*------------------------------------------------------------------------------------*/
+                //화면상 좌상단 지도 좌표 얻어오기
+                //카메라 이동할때마다 실행
+                kakaoMap.setOnCameraMoveEndListener { kakaoMap, position, gestureType ->
+                    val position = kakaoMap.fromScreenPoint(0 ,0)
+                    if (position != null) {
+                        Toast.makeText(this@MainActivity, "뷰포트 이벤트\nlatitude: ${position.latitude}\nlongitude: ${position.longitude}}", Toast.LENGTH_LONG).show()
+                    }
+                }
+
             }
         })
+
+
     }
 }
