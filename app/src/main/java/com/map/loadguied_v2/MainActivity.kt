@@ -1,10 +1,10 @@
 package com.map.loadguied_v2
 
 import android.graphics.Color
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.kakao.vectormap.KakaoMap
 import com.kakao.vectormap.KakaoMapReadyCallback
 import com.kakao.vectormap.LatLng
@@ -14,8 +14,18 @@ import com.kakao.vectormap.MapView
 import com.kakao.vectormap.label.LabelOptions
 import com.kakao.vectormap.label.LabelStyle
 import com.kakao.vectormap.label.LabelStyles
+import com.kakao.vectormap.route.RouteLineLayer
+import com.kakao.vectormap.route.RouteLineOptions
+import com.kakao.vectormap.route.RouteLineSegment
+import com.kakao.vectormap.route.RouteLineStyle
+import com.kakao.vectormap.route.RouteLineStyles
+import com.kakao.vectormap.route.RouteLineStylesSet
+import java.util.Arrays
+
 
 class MainActivity : AppCompatActivity() {
+
+    public lateinit var layer: RouteLineLayer
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -33,6 +43,9 @@ class MainActivity : AppCompatActivity() {
             }
         }, object : KakaoMapReadyCallback() {
             override fun onMapReady(kakaoMap: KakaoMap) {
+
+                layer = kakaoMap.routeLineManager!!.layer
+
                 // 인증 후 API 가 정상적으로 실행될 때 호출됨
 /*------------------------------------------------------------------------------------*/
 //              MapOverlay
@@ -66,6 +79,7 @@ class MainActivity : AppCompatActivity() {
                         .setTextStyles(32, Color.BLACK, 1, Color.GRAY).setZoomLevel(15)
                 )
 
+                
                 // 라벨 스타일 추가
 
                 // 라벨 스타일 추가
@@ -78,6 +92,42 @@ class MainActivity : AppCompatActivity() {
                 val label = kakaoMap.labelManager!!.layer!!.addLabel(
                     LabelOptions.from(pos).setStyles(styles).setTexts("★맛있는 치킨★", "123-4567")
                 )
+
+
+/*------------------------------------------------------------------------------------*/
+                //라인 그리기
+
+                // 1. RouteLineLayer 가져오기
+//               val layer = layer
+
+                // 2. RouteLineStylesSet 생성하기
+                val stylesSet = RouteLineStylesSet.from(
+                    "blueStyles",
+                    RouteLineStyles.from(RouteLineStyle.from(16f, Color.BLUE))
+                )
+
+                // 3. RouteLineSegment 생성하기 - 세그먼트에 스타일 설정을 생략하면, RouteLineStylesSet 의 index 0 번째에 해당되는 스타일로 설정된다.
+                // 3-1. index 를 통해 RouteLineStylesSet 에 있는 styles 를 가져온다.
+                val segment = RouteLineSegment.from(
+                    Arrays.asList(
+                        LatLng.from(37.394660, 127.111182),
+                        LatLng.from(37.33856778190988, 127.093663107081)
+                    )
+                )
+                    .setStyles(stylesSet.getStyles(0))
+
+                // // 3-2. id 를 통해 RouteLineStylesSet 에 있는 styles 를 가져온다.
+                // RouteLineSegment segment = RouteLineSegment.from(Arrays.asList(
+                //                 LatLng.from(37.338549743448546,127.09368565409382),
+                //                 LatLng.from(37.33856778190988,127.093663107081)))
+                //         .setStyles(stylesSet.getStyles("blueStyles"));
+
+                // 4. RouteLineStylesSet 을 추가하고 RouteLineOptions 생성하기
+                val options = RouteLineOptions.from(segment).setStylesSet(stylesSet)
+
+                // 5. RouteLineLayer 에 추가하여 RouteLine 생성하기
+
+                val routeLine = layer.addRouteLine(options)
             }
         })
     }
