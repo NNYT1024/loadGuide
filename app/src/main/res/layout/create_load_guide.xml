@@ -4,12 +4,46 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".createGuide.createMainActivity">
+    android:orientation="vertical"
+    tools:context=".createGuide.createGuideMainActivity">
 
-
-    <com.kakao.vectormap.MapView
-        android:id="@+id/map_view"
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_weight="8">
+        <com.kakao.vectormap.MapView
+            android:id="@+id/map_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            tools:layout_editor_absoluteX="0dp"
+            tools:layout_editor_absoluteY="0dp">
 
+        </com.kakao.vectormap.MapView>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#000000"
+            android:layout_centerInParent="true"
+            />
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#000000"
+            android:layout_centerInParent="true"
+            />
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/addPoiBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="커브 지점 추가"
+        android:textAlignment="center"/>
+</LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

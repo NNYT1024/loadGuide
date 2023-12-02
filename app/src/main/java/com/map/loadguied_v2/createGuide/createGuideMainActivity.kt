@@ -1,8 +1,10 @@
 package com.map.loadguied_v2.createGuide
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.kakao.vectormap.KakaoMap
@@ -28,6 +30,9 @@ class createGuideMainActivity  : AppCompatActivity() {
     public lateinit var layer: RouteLineLayer
     public lateinit var label : com.kakao.vectormap.label.Label
     public lateinit var labelLayer : com.kakao.vectormap.label.LabelLayer
+    public lateinit var kakaoMap : KakaoMap
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,8 +50,8 @@ class createGuideMainActivity  : AppCompatActivity() {
                 // 인증 실패 및 지도 사용 중 에러가 발생할 때 호출됨
             }
         }, object : KakaoMapReadyCallback() {
-            override fun onMapReady(kakaoMap: KakaoMap) {
-
+            override fun onMapReady(kMap: KakaoMap) {
+                kakaoMap = kMap
                 layer = kakaoMap.routeLineManager!!.layer
 
                 // 인증 후 API 가 정상적으로 실행될 때 호출됨
@@ -152,8 +157,17 @@ class createGuideMainActivity  : AppCompatActivity() {
 
             }
         })
-
+        var addPoiBtn = findViewById<Button>(R.id.addPoiBtn)
+        addPoiBtn.setOnClickListener {
+            //버튼 클릭시 함수 실행
+            setLabel()
+        }
 
     }
-
+    fun setLabel() {
+        //현재 표시중인 라벨의 위치를 출력
+        var latitude = label.position.latitude
+        var longitude = label.position.longitude
+        Toast.makeText(applicationContext, "${latitude}\n${longitude}", Toast.LENGTH_SHORT).show()
+    }
 }
