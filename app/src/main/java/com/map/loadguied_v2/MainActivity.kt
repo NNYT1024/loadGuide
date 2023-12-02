@@ -6,7 +6,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.kakao.vectormap.KakaoMap
-import com.kakao.vectormap.KakaoMap.OnViewportChangeListener
 import com.kakao.vectormap.KakaoMapReadyCallback
 import com.kakao.vectormap.LatLng
 import com.kakao.vectormap.MapLifeCycleCallback
@@ -27,6 +26,9 @@ import java.util.Arrays
 class MainActivity : AppCompatActivity() {
 
     public lateinit var layer: RouteLineLayer
+    public lateinit var label : com.kakao.vectormap.label.Label
+    public lateinit var labelLayer : com.kakao.vectormap.label.LabelLayer
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -88,13 +90,11 @@ class MainActivity : AppCompatActivity() {
 
                 // 라벨 생성
 
-                // 라벨 생성
-                val pos = LatLng.from(37.394660,127.111182)
-                val label = kakaoMap.labelManager!!.layer!!.addLabel(
-                    LabelOptions.from(pos).setStyles(styles).setTexts("★맛있는 치킨★", "123-4567")
+                val pos = LatLng.from(37.40018735490742,127.10967869405424)
+                labelLayer = kakaoMap.labelManager!!.layer!!
+                label = labelLayer.addLabel(
+                    LabelOptions.from(pos).setStyles(styles).setTexts("최초 라벨", "내용")
                 )
-
-
 /*------------------------------------------------------------------------------------*/
                 //라인 그리기
 
@@ -135,7 +135,18 @@ class MainActivity : AppCompatActivity() {
                 kakaoMap.setOnCameraMoveEndListener { kakaoMap, position, gestureType ->
                     val position = kakaoMap.fromScreenPoint(0 ,0)
                     if (position != null) {
-                        Toast.makeText(this@MainActivity, "뷰포트 이벤트\nlatitude: ${position.latitude}\nlongitude: ${position.longitude}}", Toast.LENGTH_LONG).show()
+                        //Toast.makeText(this@MainActivity, "뷰포트 이벤트\nlatitude: ${position.latitude}\nlongitude: ${position.longitude}}", Toast.LENGTH_LONG).show()
+                        val camera = kakaoMap.cameraPosition
+                        if(camera != null) {
+                            val positionPosition = camera.position
+                            Toast.makeText( this@MainActivity, "${positionPosition.longitude}", Toast.LENGTH_LONG).show()
+                            // 라벨 생성
+                            val pos = LatLng.from(positionPosition.latitude,positionPosition.longitude)
+                            labelLayer.remove(label)
+                            label = kakaoMap.labelManager!!.layer!!.addLabel(
+                                LabelOptions.from(pos).setStyles(styles).setTexts("${positionPosition.latitude}", "${positionPosition.longitude}")
+                            )
+                        }
                     }
                 }
 
