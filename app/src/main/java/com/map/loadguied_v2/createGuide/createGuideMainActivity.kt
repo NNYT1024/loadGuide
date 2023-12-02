@@ -1,9 +1,11 @@
 package com.map.loadguied_v2.createGuide
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.view.MotionEvent
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -36,9 +38,13 @@ class createGuideMainActivity  : AppCompatActivity() {
     public val stylesSet: RouteLineStylesSet = RouteLineStylesSet.from(
         "blue", RouteLineStyles.from(RouteLineStyle.from(16f, Color.BLUE))
     )
+    private var isDragging = false
+    private var initialX = 0f
+    private var initialY = 0f
 
     lateinit var backPo : LatLng
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.create_load_guide)
@@ -168,7 +174,33 @@ class createGuideMainActivity  : AppCompatActivity() {
             }
             //Toast.makeText(applicationContext, "리스트 크기 : ${positionList.size}", Toast.LENGTH_SHORT).show()
         }
+        val draggableButton = findViewById<Button>(R.id.addPoiBtn)
 
+        // 터치 이벤트 처리
+        draggableButton.setOnLongClickListener {
+            isDragging = true
+            initialX = it.x - it.width / 2
+            initialY = it.y - it.height / 2
+            true // true를 반환하여 이벤트 소비
+        }
+
+        // 터치 이벤트 처리
+        draggableButton.setOnTouchListener { v, event ->
+            if (isDragging) {
+                when (event.action) {
+                    MotionEvent.ACTION_MOVE -> {
+                        v.x = event.rawX - v.width / 2
+                        v.y = event.rawY - v.height / 2
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        isDragging = false
+                    }
+                }
+                true
+            } else {
+                false
+            }
+        }
     }
     fun getCenterPosition(): LatLng {
 //        현재 표시중인 라벨의 위치를 출력
