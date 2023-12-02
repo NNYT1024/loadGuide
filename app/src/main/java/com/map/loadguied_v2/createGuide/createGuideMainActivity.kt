@@ -13,6 +13,7 @@ import com.kakao.vectormap.LatLng
 import com.kakao.vectormap.MapLifeCycleCallback
 import com.kakao.vectormap.MapOverlay
 import com.kakao.vectormap.MapView
+import com.kakao.vectormap.camera.CameraPosition
 import com.kakao.vectormap.label.LabelOptions
 import com.kakao.vectormap.label.LabelStyle
 import com.kakao.vectormap.label.LabelStyles
@@ -31,13 +32,20 @@ class createGuideMainActivity  : AppCompatActivity() {
     public lateinit var label : com.kakao.vectormap.label.Label
     public lateinit var labelLayer : com.kakao.vectormap.label.LabelLayer
     public lateinit var kakaoMap : KakaoMap
+    val positionList = mutableListOf<LatLng>()
+    public val stylesSet: RouteLineStylesSet = RouteLineStylesSet.from(
+        "blue", RouteLineStyles.from(RouteLineStyle.from(16f, Color.BLUE))
+    )
 
-
+    lateinit var backPo : LatLng
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.create_load_guide)
+//      지도에 표시할 라인 스타일
 
+        
+        
         val mapView = findViewById<MapView>(R.id.map_view)
         mapView.start(object : MapLifeCycleCallback() {
             override fun onMapDestroy() {
@@ -53,7 +61,9 @@ class createGuideMainActivity  : AppCompatActivity() {
             override fun onMapReady(kMap: KakaoMap) {
                 kakaoMap = kMap
                 layer = kakaoMap.routeLineManager!!.layer
-
+                backPo = getCenterPosition()//최초 시작지점 설정
+                positionList.add(backPo)
+//                Toast.makeText(applicationContext, "최초 위치 설정\n{$backPo}", Toast.LENGTH_SHORT).show()
                 // 인증 후 API 가 정상적으로 실행될 때 호출됨
                 /*------------------------------------------------------------------------------------*/
 //              MapOverlay
@@ -95,10 +105,10 @@ class createGuideMainActivity  : AppCompatActivity() {
 
                 // 라벨 생성
 
-                val pos = LatLng.from(37.40018735490742,127.10967869405424)
+                val pos = getCenterPosition()
                 labelLayer = kakaoMap.labelManager!!.layer!!
                 label = labelLayer.addLabel(
-                    LabelOptions.from(pos).setStyles(styles).setTexts("최초 라벨", "내용")
+                    LabelOptions.from(pos).setStyles(styles).setTexts("임의의 시작점")
                 )
                 /*------------------------------------------------------------------------------------*/
                 //라인 그리기
@@ -107,10 +117,10 @@ class createGuideMainActivity  : AppCompatActivity() {
 //               val layer = layer
 
                 // 2. RouteLineStylesSet 생성하기
-                val stylesSet = RouteLineStylesSet.from(
-                    "blueStyles",
-                    RouteLineStyles.from(RouteLineStyle.from(16f, Color.BLUE))
-                )
+//                val stylesSet = RouteLineStylesSet.from(
+//                    "blueStyles",
+//                    RouteLineStyles.from(RouteLineStyle.from(16f, Color.BLUE))
+//                )
 
                 // 3. RouteLineSegment 생성하기 - 세그먼트에 스타일 설정을 생략하면, RouteLineStylesSet 의 index 0 번째에 해당되는 스타일로 설정된다.
                 // 3-1. index 를 통해 RouteLineStylesSet 에 있는 styles 를 가져온다.
@@ -119,8 +129,7 @@ class createGuideMainActivity  : AppCompatActivity() {
                         LatLng.from(37.394660, 127.111182),
                         LatLng.from(37.33856778190988, 127.093663107081)
                     )
-                )
-                    .setStyles(stylesSet.getStyles(0))
+                ).setStyles(stylesSet.getStyles(0))
 
                 // // 3-2. id 를 통해 RouteLineStylesSet 에 있는 styles 를 가져온다.
                 // RouteLineSegment segment = RouteLineSegment.from(Arrays.asList(
@@ -138,21 +147,14 @@ class createGuideMainActivity  : AppCompatActivity() {
                 //화면상 좌상단 지도 좌표 얻어오기
                 //카메라 이동할때마다 실행
                 kakaoMap.setOnCameraMoveEndListener { kakaoMap, position, gestureType ->
-                    val position = kakaoMap.fromScreenPoint(0 ,0)
-                    if (position != null) {
-                        //Toast.makeText(this@MainActivity, "뷰포트 이벤트\nlatitude: ${position.latitude}\nlongitude: ${position.longitude}}", Toast.LENGTH_LONG).show()
-                        val camera = kakaoMap.cameraPosition
-                        if(camera != null) {
-                            val positionPosition = camera.position
-                            Toast.makeText( applicationContext, "${positionPosition.longitude}", Toast.LENGTH_LONG).show()
-                            // 라벨 생성
-                            val pos = LatLng.from(positionPosition.latitude,positionPosition.longitude)
-                            labelLayer.remove(label)
-                            label = kakaoMap.labelManager!!.layer!!.addLabel(
-                                LabelOptions.from(pos).setStyles(styles).setTexts("${positionPosition.latitude}", "${positionPosition.longitude}")
-                            )
-                        }
-                    }
+                    val position = kakaoMap.fromScreenPoint(0 ,0)//화면상에서 특정위치 좌표
+                    if (position != null) { }
+                    val pos = getCenterPosition()//위치 지정
+
+                    labelLayer.remove(label)//기존 라벨 삭제
+                    label = kakaoMap.labelManager!!.layer!!.addLabel(
+                        LabelOptions.from(pos).setStyles(styles).setTexts("새로운 위치")
+                    )// 라벨 추가
                 }
 
             }
@@ -160,14 +162,63 @@ class createGuideMainActivity  : AppCompatActivity() {
         var addPoiBtn = findViewById<Button>(R.id.addPoiBtn)
         addPoiBtn.setOnClickListener {
             //버튼 클릭시 함수 실행
-            setLabel()
+            positionList.add(getCenterPosition())
+            if(positionList.size >= 10){
+                drawLines(positionList,0)
+            }
+            //Toast.makeText(applicationContext, "리스트 크기 : ${positionList.size}", Toast.LENGTH_SHORT).show()
         }
 
     }
-    fun setLabel() {
-        //현재 표시중인 라벨의 위치를 출력
-        var latitude = label.position.latitude
-        var longitude = label.position.longitude
-        Toast.makeText(applicationContext, "${latitude}\n${longitude}", Toast.LENGTH_SHORT).show()
+    fun getCenterPosition(): LatLng {
+//        현재 표시중인 라벨의 위치를 출력
+//        var latitude = label.position.latitude
+//        var longitude = label.position.longitude
+//        Toast.makeText(applicationContext, "${latitude}\n${longitude}", Toast.LENGTH_SHORT).show()
+
+        var camera = kakaoMap.cameraPosition //현재 카메라 위치
+        var x : Double = 0.0
+        var y : Double = 0.0
+
+        if(camera != null) {
+            val cameraPosition = camera.position
+            x = cameraPosition.latitude
+            y = cameraPosition.longitude
+//            Toast.makeText( applicationContext, "${x}\n${y}", Toast.LENGTH_LONG).show()
+        } else {
+            x = 0.0; y = 0.0
+        }
+        return LatLng.from(x,y)
+    }
+
+    fun drawLine(po1 : LatLng, po2 : LatLng, styleIndex : Int) {
+        //입력된 두 좌표를 연결
+        val segment = RouteLineSegment.from(
+            Arrays.asList( po1, po2)
+        ).setStyles(stylesSet.getStyles(styleIndex))
+        //Toast.makeText(applicationContext, "${po1.longitude}\n${po1.latitude}", Toast.LENGTH_LONG).show()
+        //Toast.makeText(applicationContext, "${po2.longitude}\n${po2.latitude}", Toast.LENGTH_LONG).show()
+        val options = RouteLineOptions.from(segment).setStylesSet(stylesSet)
+
+        // 5. RouteLineLayer 에 추가하여 RouteLine 생성하기
+        val routeLine = layer.addRouteLine(options)
+        //positionList.add(po2)
+        backPo = po2
+    }
+
+    fun drawLines(list : MutableList<LatLng>, styleIndex : Int) {
+        //리스트로 저장된 좌표를 순차적으로 연결
+        var po1 : LatLng = list.get(0)
+        var po2 : LatLng
+        for(i: Int in 1..list.size-1){
+            po2 = list.get(i)
+            drawLine(po1,po2,styleIndex)
+            po1 = po2;
+        }
+        list.clear()
+        list.add(po1)
+    }
+    public fun connectLoadLine(){//마지막 좌표와 목표를 연결 카카오 길찾기API 사용
+
     }
 }

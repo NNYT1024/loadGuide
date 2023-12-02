@@ -1,34 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
     tools:context=".MainActivity">
+    <LinearLayout
+        android:layout_width="280dp"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:gravity="center" >
+    <EditText
+        android:id="@+id/startAdress_TextFiled"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:ems="10"
+        android:inputType="text"
+        android:enabled="false"
+        android:hint="출발지"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="MissingConstraints" />
+
+        <Button
+            android:id="@+id/startAdressSerch_Btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Widget.AppCompat.Button"
+            android:text="설정" />
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="280dp"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:gravity="center" >
+        <EditText
+            android:id="@+id/endAdress_TextFiled"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:ems="10"
+            android:inputType="text"
+            android:enabled="false"
+            android:hint="도착지"
+
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="MissingConstraints" />
+
+        <Button
+            android:id="@+id/endAdressSerch_Btn"
+            style="@style/Widget.AppCompat.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="설정" />
+
+    </LinearLayout>
 
     <Button
-        android:id="@+id/createGuideBtn"
-        android:layout_width="190dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="232dp"
-        android:layout_marginBottom="97dp"
-        android:text="가이드 생성"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        app:layout_constraintBottom_toTopOf="@+id/loadGuideBtn"
+        android:id="@+id/createGuide_Btn"
+        android:layout_width="189dp"
+        android:layout_height="56dp"
+        android:backgroundTint="@color/skyblue"
+        android:text="가이드 만들기"
+        android:textColor="@color/white"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.524"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         tools:ignore="MissingConstraints" />
 
     <Button
-        android:id="@+id/loadGuideBtn"
-        android:layout_width="185dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="265dp"
+        android:id="@+id/loadGuide_Btn"
+        android:layout_width="189dp"
+        android:layout_height="56dp"
+        android:backgroundTint="@color/skyblue"
         android:text="가이드 불러오기"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:textColor="@color/white"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.513"
-        app:layout_constraintStart_toStartOf="parent"/>
-</androidx.constraintlayout.widget.ConstraintLayout>
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="MissingConstraints" />
+
+
+</LinearLayout>
