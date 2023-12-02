@@ -6,10 +6,29 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <Button
+        android:id="@+id/createGuideBtn"
+        android:layout_width="190dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="232dp"
+        android:layout_marginBottom="97dp"
+        android:text="가이드 생성"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        app:layout_constraintBottom_toTopOf="@+id/loadGuideBtn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.524"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="MissingConstraints" />
 
-    <com.kakao.vectormap.MapView
-        android:id="@+id/map_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
+    <Button
+        android:id="@+id/loadGuideBtn"
+        android:layout_width="185dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="265dp"
+        android:text="가이드 불러오기"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.513"
+        app:layout_constraintStart_toStartOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
