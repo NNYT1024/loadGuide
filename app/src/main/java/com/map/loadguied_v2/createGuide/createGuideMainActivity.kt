@@ -23,7 +23,7 @@ import com.kakao.vectormap.route.RouteLineStylesSet
 import com.map.loadguied_v2.R
 import java.util.Arrays
 
-class createMainActivity  : AppCompatActivity() {
+class createGuideMainActivity  : AppCompatActivity() {
 
     public lateinit var layer: RouteLineLayer
     public lateinit var label : com.kakao.vectormap.label.Label
@@ -31,7 +31,7 @@ class createMainActivity  : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.create_load_guide)
 
         val mapView = findViewById<MapView>(R.id.map_view)
         mapView.start(object : MapLifeCycleCallback() {
@@ -41,7 +41,7 @@ class createMainActivity  : AppCompatActivity() {
 
             override fun onMapError(error: Exception) {
                 Log.e("인증실패 에러 발생", "{${error.message}}}")
-                Toast.makeText(this@createMainActivity, "에러 발생{$error}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext, "에러 발생{$error}", Toast.LENGTH_SHORT).show()
                 // 인증 실패 및 지도 사용 중 에러가 발생할 때 호출됨
             }
         }, object : KakaoMapReadyCallback() {
@@ -139,7 +139,7 @@ class createMainActivity  : AppCompatActivity() {
                         val camera = kakaoMap.cameraPosition
                         if(camera != null) {
                             val positionPosition = camera.position
-                            Toast.makeText( this@createMainActivity, "${positionPosition.longitude}", Toast.LENGTH_LONG).show()
+                            Toast.makeText( applicationContext, "${positionPosition.longitude}", Toast.LENGTH_LONG).show()
                             // 라벨 생성
                             val pos = LatLng.from(positionPosition.latitude,positionPosition.longitude)
                             labelLayer.remove(label)
