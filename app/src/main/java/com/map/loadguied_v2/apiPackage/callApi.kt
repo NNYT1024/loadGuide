@@ -128,9 +128,11 @@ class callApi {
                 if (!response.isSuccessful) throw IOException("Unexpected code $response")
                 response.body?.string() ?: ""
             }
+            
         } catch (e: IOException) {
             e.printStackTrace()
             ""
         }
+        
     }
 }

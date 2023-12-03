@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MotionEvent
 import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.kakao.vectormap.KakaoMap
@@ -14,32 +15,35 @@ import com.kakao.vectormap.LatLng
 import com.kakao.vectormap.MapLifeCycleCallback
 import com.kakao.vectormap.MapOverlay
 import com.kakao.vectormap.MapView
+import com.kakao.vectormap.camera.CameraUpdate
 import com.kakao.vectormap.camera.CameraUpdateFactory
-import com.kakao.vectormap.label.LabelOptions
-import com.kakao.vectormap.label.LabelStyle
-import com.kakao.vectormap.label.LabelStyles
 import com.kakao.vectormap.route.RouteLineLayer
 import com.kakao.vectormap.route.RouteLineOptions
 import com.kakao.vectormap.route.RouteLineSegment
 import com.kakao.vectormap.route.RouteLineStyle
+import com.kakao.vectormap.shape.DotPoints
+import com.kakao.vectormap.shape.Polygon
+import com.kakao.vectormap.shape.PolygonOptions
 import com.map.loadguied_v2.R
+import com.map.loadguied_v2.apiPackage.*
+import kotlinx.coroutines.*
 import java.util.Arrays
 
 
 class createGuideMainActivity  : AppCompatActivity() {
-
+    val apiCaller = callApi()
     public lateinit var layer: RouteLineLayer
     public lateinit var label : com.kakao.vectormap.label.Label
     public lateinit var labelLayer : com.kakao.vectormap.label.LabelLayer
+    public lateinit var shapeLayer : com.kakao.vectormap.shape.ShapeLayer
     public lateinit var kakaoMap : KakaoMap
     val positionList = mutableListOf<LatLng>()
-
+    lateinit var shapeManager :  com.kakao.vectormap.shape.ShapeManager
     private var isDragging = false
     private var initialX = 0f
     private var initialY = 0f
-
+    lateinit var polygon: Polygon
     lateinit var backPo : LatLng
-
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,11 +51,18 @@ class createGuideMainActivity  : AppCompatActivity() {
 //      지도에 표시할 라인 스타일
 
         //최초위지 지정
-        var x = intent.getStringExtra("x")!!.toDouble()
-        var y = intent.getStringExtra("y")!!.toDouble()
+//        var x = intent.getStringExtra("x")!!.toDouble()
+//        var y = intent.getStringExtra("y")!!.toDouble()
 
-
+        val scope = CoroutineScope(Dispatchers.Default)
         val mapView = findViewById<MapView>(R.id.map_view)
+        var addPoiBtn = findViewById<Button>(R.id.addPoiBtn)
+        val Address_TextFiled = findViewById<EditText>(R.id.Address_TextFiled)
+        val moveMap_Btn = findViewById<Button>(R.id.moveMap_Btn)
+        val setStart_Btn = findViewById<Button>(R.id.setStart_Btn)
+        val setEnd_Btn = findViewById<Button>(R.id.setEnd_Btn)
+        var polygonRadius : Float = 10F
+
         mapView.start(object : MapLifeCycleCallback() {
             override fun onMapDestroy() {
                 // 지도 API 가 정상적으로 종료될 때 호출됨
@@ -66,10 +77,14 @@ class createGuideMainActivity  : AppCompatActivity() {
             override fun onMapReady(kMap: KakaoMap) {
                 kakaoMap = kMap
                 layer = kakaoMap.routeLineManager!!.layer
-                val cameraUpdate = CameraUpdateFactory.newCenterPosition(LatLng.from(y, x))
-                kakaoMap.moveCamera(cameraUpdate);
+                shapeManager = kakaoMap.getShapeManager()!!
+//                val cameraUpdate = CameraUpdateFactory.newCenterPosition(LatLng.from(y, x))
+//                kakaoMap.moveCamera(cameraUpdate);
 
-                backPo = getCenterPosition()//최초 시작지점 설정
+                val pos = getCenterPosition()
+                labelLayer = kakaoMap.labelManager!!.layer!!
+                shapeLayer =  shapeManager!!.getLayer()!!
+                backPo = pos//최초 시작지점 설정
 
                 positionList.clear()
 
@@ -78,6 +93,11 @@ class createGuideMainActivity  : AppCompatActivity() {
                 drawLines(positionList,0)
 
                 positionList.add(backPo)
+
+                val options = PolygonOptions.from(
+                    DotPoints.fromCircle(pos, polygonRadius), Color.parseColor("#f55d44")
+                )
+                polygon = shapeLayer.addPolygon(options)
 
 //                Toast.makeText(applicationContext, "최초 위치 설정\n{$backPo}", Toast.LENGTH_SHORT).show()
                 // 인증 후 API 가 정상적으로 실행될 때 호출됨
@@ -105,27 +125,25 @@ class createGuideMainActivity  : AppCompatActivity() {
                 // 8 ~ 10 까지              : red_marker 이미지 나옴
                 // 11 ~ 14 까지             : blue_marker 이미지 나옴
                 // 15 ~ Max ZoomLevel 까지  : blue_marker 이미지와 텍스트 나옴
-                var styles = LabelStyles.from(
-                    "myStyleId",
-                    LabelStyle.from(R.drawable.blue_marker).setZoomLevel(8),
-                    LabelStyle.from(R.drawable.blue_marker).setZoomLevel(11),
-                    LabelStyle.from(R.drawable.blue_marker)
-                        .setTextStyles(32, Color.BLACK, 1, Color.GRAY).setZoomLevel(15)
-                )
-
-
-                // 라벨 스타일 추가
-
-                // 라벨 스타일 추가
-                styles = kakaoMap.labelManager!!.addLabelStyles(styles!!)
+//                var styles = LabelStyles.from(
+//                    "myStyleId",
+//                    LabelStyle.from(R.drawable.blue_marker).setZoomLevel(8),
+//                    LabelStyle.from(R.drawable.blue_marker).setZoomLevel(11),
+//                    LabelStyle.from(R.drawable.blue_marker)
+//                        .setTextStyles(32, Color.BLACK, 1, Color.GRAY).setZoomLevel(15)
+//                )
+//
+//
+//                // 라벨 스타일 추가
+//
+//                // 라벨 스타일 추가
+//                styles = kakaoMap.labelManager!!.addLabelStyles(styles!!)
 
                 // 라벨 생성
 
-                val pos = getCenterPosition()
-                labelLayer = kakaoMap.labelManager!!.layer!!
-                label = labelLayer.addLabel(
-                    LabelOptions.from(pos).setStyles(styles).setTexts("임의의 시작점")
-                )
+//                label = labelLayer.addLabel(
+//                    LabelOptions.from(pos).setStyles(styles).setTexts("임의의 시작점")
+//                )
                 /*------------------------------------------------------------------------------------*/
                 //라인 그리기
 
@@ -165,17 +183,86 @@ class createGuideMainActivity  : AppCompatActivity() {
                 kakaoMap.setOnCameraMoveEndListener { kakaoMap, position, gestureType ->
                     val position = kakaoMap.fromScreenPoint(0 ,0)//화면상에서 특정위치 좌표
                     if (position != null) { }
-                    val pos = getCenterPosition()//위치 지정
 
-                    labelLayer.remove(label)//기존 라벨 삭제
-                    label = kakaoMap.labelManager!!.layer!!.addLabel(
-                        LabelOptions.from(pos).setStyles(styles).setTexts("새로운 위치")
-                    )// 라벨 추가
+                    val pos = getCenterPosition()//위치 지정
+                    val options = PolygonOptions.from(
+                        DotPoints.fromCircle(pos, polygonRadius), Color.parseColor("#f55d44")
+                    )
+                    Log.d("폴리곤 정보","${polygon.mapPoints.size}")
+                    shapeLayer.remove(polygon)
+                    polygon = shapeLayer.addPolygon(options)
+
+//                    labelLayer.remove(label)//기존 라벨 삭제
+//                    label = kakaoMap.labelManager!!.layer!!.addLabel(
+//                        LabelOptions.from(pos).setStyles(styles).setTexts("새로운 위치")
+//                    )// 라벨 추가
                 }
 
             }
         })
-        var addPoiBtn = findViewById<Button>(R.id.addPoiBtn)
+/*
+* var startData : findAddress_Json
+        var endData : findAddress_Json
+
+        runBlocking(Dispatchers.Default) {
+            val result : String
+
+            startData = findAddress_Json(async { apiCaller.getAddress("용마공원로 9길 29") }.await())
+            endData = findAddress_Json(async { apiCaller.getAddress("인천광역시 부평구 무네미로448번길 56") }.await())
+        }
+
+        var startX = startData.documents.get(0).getX().toDouble()
+        var startY = startData.documents.get(0).getY().toDouble()
+        var endX = endData.documents.get(0).getX().toDouble()
+        var endY = endData.documents.get(0).getY().toDouble()
+
+        apiCaller.directions(startX,startY,endX,endY)
+
+        val apiCaller = callApi()
+
+        GlobalScope.launch {
+            val pointList = apiCaller.directions_syc(startX,startY,endX,endY)
+            for(i: Int in 0..pointList.size-1){
+                Log.d("메인에서 리스트 출력","${pointList.get(i)[0][0]}:${pointList.get(i)[0][1]}")
+            }
+            // pointList를 사용하는 코드 작성
+        }
+* */
+
+        moveMap_Btn.setOnClickListener {
+            var move : Boolean = false;
+            runBlocking(Dispatchers.Default) {
+                var addressText = Address_TextFiled.text.toString()
+                var apiResult =async { apiCaller.getAddress(addressText) }.await()
+                Log.d("API 반환값","${apiResult.length}")
+                if(apiResult.length != 0 ){
+
+                    var startData = findAddress_Json(apiResult)
+                    Log.d("이동 버튼 클릭",startData.toString())
+                    if(startData.documents.size > 0){
+                        //if(startData.metaData.total_count > 0){
+                        var startX = startData.documents.get(0).getX().toDouble()
+                        var startY = startData.documents.get(0).getY().toDouble()
+                        Log.d("카메라 이동","시도")
+                        var camera: CameraUpdate = CameraUpdateFactory.newCenterPosition(LatLng.from(startY, startX));
+                        kakaoMap.moveCamera(camera)
+                        kakaoMap.moveCamera(CameraUpdateFactory.zoomTo(15))
+                        Log.d("카메라 이동","성공")
+                        move = true
+                    }
+                }
+            }
+            if(!move){
+                Toast.makeText( applicationContext, "유효한 주소가 아닙니다.", Toast.LENGTH_SHORT).show()
+                //runBlocking내부에서 사용시 앱 종료
+            }
+        }
+        setStart_Btn.setOnClickListener {
+
+        }
+        setEnd_Btn.setOnClickListener {
+
+        }
         addPoiBtn.setOnClickListener {
             //버튼 클릭시 함수 실행
             positionList.add(getCenterPosition())
@@ -212,6 +299,7 @@ class createGuideMainActivity  : AppCompatActivity() {
             }
         }
     }
+
     fun getCenterPosition(): LatLng {
 //        현재 표시중인 라벨의 위치를 출력
 //        var latitude = label.position.latitude
@@ -226,7 +314,7 @@ class createGuideMainActivity  : AppCompatActivity() {
             val cameraPosition = camera.position
             x = cameraPosition.latitude
             y = cameraPosition.longitude
-            Toast.makeText( applicationContext, "${x}\n${y}", Toast.LENGTH_LONG).show()
+            //Toast.makeText( applicationContext, "${x}\n${y}", Toast.LENGTH_LONG).show()
         } else {
             x = 0.0; y = 0.0
         }

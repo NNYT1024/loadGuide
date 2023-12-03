@@ -16,28 +16,14 @@ public class findAddress_Json {//주소검색 반환값 정리
         try {
             JSONObject jObject = new JSONObject(jsonString);
 
+            Log.d("getJsonData후",jObject.toString());
             getJsonData(jObject); //여기서 멈춤
-            Log.d("getJsonData후",jsonString);
         } catch (JSONException e) {
             Log.e("문자열 입력 에러",e.getMessage());
-            throw new RuntimeException(e);
+            setMetaData(new meta());
+            setDocuments(new document());
+            //throw new RuntimeException(e);
         }
-    }
-
-    public HashMap<String,String> getAddressIndexData(int index){
-        HashMap<String,String> result = new HashMap<String,String>();
-        document doc = documents.get(index);
-        result.put("x",doc.x);
-        result.put("y",doc.y);
-
-        result.put("address_name",doc.address_name);
-        result.put("address_type",doc.address_type);
-
-        return result;
-    }
-
-    public findAddress_Json(JSONObject obj){
-        getJsonData(obj);
     }
 
     public void getJsonData(JSONObject obj){
@@ -63,7 +49,7 @@ public class findAddress_Json {//주소검색 반환값 정리
             setMetaData(new meta());
             setDocuments(new document());
             
-            throw new RuntimeException(e);
+            //throw new RuntimeException(e);
         } catch(Exception e){
 
             Log.e("반환데이터 Exception 에러",e.getMessage());

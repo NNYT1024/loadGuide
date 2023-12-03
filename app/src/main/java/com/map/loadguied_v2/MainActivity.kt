@@ -3,29 +3,12 @@ package com.map.loadguied_v2
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.webkit.WebView.findAddress
 import android.widget.Button
-import android.widget.EditText
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.map.loadguied_v2.apiPackage.callApi
-import com.map.loadguied_v2.apiPackage.findAddress_Json
+import com.map.loadguied_v2.apiPackage.*
 import com.map.loadguied_v2.createGuide.createGuideMainActivity
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.MediaType
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody
-import okhttp3.Response
-import org.json.JSONObject
-import java.io.IOException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+
+import kotlinx.coroutines.*
 
 class MainActivity : AppCompatActivity() {
     val apiCaller = callApi()

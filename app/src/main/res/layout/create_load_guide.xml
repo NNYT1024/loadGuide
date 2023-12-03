@@ -8,9 +8,9 @@
     tools:context=".createGuide.createGuideMainActivity">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -42,19 +42,70 @@
                 android:layout_weight="1"
                 android:text="커브 지점 추가"
                 android:textAlignment="center" />
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#000000"
                 android:layout_centerInParent="true"
-                />
+                android:background="#000000" />
+
             <View
                 android:layout_width="1dp"
                 android:layout_height="match_parent"
-                android:background="#000000"
                 android:layout_centerInParent="true"
-                />
+                android:background="#000000" />
         </RelativeLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal"
+
+            >
+
+            <EditText
+                android:id="@+id/Address_TextFiled"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="8"
+                android:inputType="text"
+                android:hint="주소 입력" />
+
+            <Button
+                android:id="@+id/moveMap_Btn"
+                style="@style/Widget.AppCompat.Button"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="이동"
+                android:textAlignment="center" />
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:orientation="horizontal"
+
+            >
+
+            <Button
+                android:id="@+id/setStart_Btn"
+                style="@style/Widget.AppCompat.Button"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="출발지 설정"
+                android:textAlignment="center" />
+
+            <Button
+                android:id="@+id/setEnd_Btn"
+                style="@style/Widget.AppCompat.Button"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="도착지 설정"
+                android:textAlignment="center" />
+
+        </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
