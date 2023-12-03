@@ -1,7 +1,6 @@
 package com.map.loadguied_v2.createGuide
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -15,7 +14,7 @@ import com.kakao.vectormap.LatLng
 import com.kakao.vectormap.MapLifeCycleCallback
 import com.kakao.vectormap.MapOverlay
 import com.kakao.vectormap.MapView
-import com.kakao.vectormap.camera.CameraPosition
+import com.kakao.vectormap.camera.CameraUpdateFactory
 import com.kakao.vectormap.label.LabelOptions
 import com.kakao.vectormap.label.LabelStyle
 import com.kakao.vectormap.label.LabelStyles
@@ -23,10 +22,9 @@ import com.kakao.vectormap.route.RouteLineLayer
 import com.kakao.vectormap.route.RouteLineOptions
 import com.kakao.vectormap.route.RouteLineSegment
 import com.kakao.vectormap.route.RouteLineStyle
-import com.kakao.vectormap.route.RouteLineStyles
-import com.kakao.vectormap.route.RouteLineStylesSet
 import com.map.loadguied_v2.R
 import java.util.Arrays
+
 
 class createGuideMainActivity  : AppCompatActivity() {
 
@@ -35,9 +33,7 @@ class createGuideMainActivity  : AppCompatActivity() {
     public lateinit var labelLayer : com.kakao.vectormap.label.LabelLayer
     public lateinit var kakaoMap : KakaoMap
     val positionList = mutableListOf<LatLng>()
-    public val stylesSet: RouteLineStylesSet = RouteLineStylesSet.from(
-        "blue", RouteLineStyles.from(RouteLineStyle.from(16f, Color.BLUE))
-    )
+
     private var isDragging = false
     private var initialX = 0f
     private var initialY = 0f
@@ -50,8 +46,11 @@ class createGuideMainActivity  : AppCompatActivity() {
         setContentView(R.layout.create_load_guide)
 //      지도에 표시할 라인 스타일
 
-        
-        
+        //최초위지 지정
+        var x = intent.getStringExtra("x")!!.toDouble()
+        var y = intent.getStringExtra("y")!!.toDouble()
+
+
         val mapView = findViewById<MapView>(R.id.map_view)
         mapView.start(object : MapLifeCycleCallback() {
             override fun onMapDestroy() {
@@ -67,8 +66,19 @@ class createGuideMainActivity  : AppCompatActivity() {
             override fun onMapReady(kMap: KakaoMap) {
                 kakaoMap = kMap
                 layer = kakaoMap.routeLineManager!!.layer
+                val cameraUpdate = CameraUpdateFactory.newCenterPosition(LatLng.from(y, x))
+                kakaoMap.moveCamera(cameraUpdate);
+
                 backPo = getCenterPosition()//최초 시작지점 설정
+
+                positionList.clear()
+
+                positionList.add(LatLng.from(37.5598076696797,127.01354446474713))
+
+                drawLines(positionList,0)
+
                 positionList.add(backPo)
+
 //                Toast.makeText(applicationContext, "최초 위치 설정\n{$backPo}", Toast.LENGTH_SHORT).show()
                 // 인증 후 API 가 정상적으로 실행될 때 호출됨
                 /*------------------------------------------------------------------------------------*/
@@ -130,24 +140,24 @@ class createGuideMainActivity  : AppCompatActivity() {
 
                 // 3. RouteLineSegment 생성하기 - 세그먼트에 스타일 설정을 생략하면, RouteLineStylesSet 의 index 0 번째에 해당되는 스타일로 설정된다.
                 // 3-1. index 를 통해 RouteLineStylesSet 에 있는 styles 를 가져온다.
-                val segment = RouteLineSegment.from(
-                    Arrays.asList(
-                        LatLng.from(37.394660, 127.111182),
-                        LatLng.from(37.33856778190988, 127.093663107081)
-                    )
-                ).setStyles(stylesSet.getStyles(0))
-
-                // // 3-2. id 를 통해 RouteLineStylesSet 에 있는 styles 를 가져온다.
-                // RouteLineSegment segment = RouteLineSegment.from(Arrays.asList(
-                //                 LatLng.from(37.338549743448546,127.09368565409382),
-                //                 LatLng.from(37.33856778190988,127.093663107081)))
-                //         .setStyles(stylesSet.getStyles("blueStyles"));
-
-                // 4. RouteLineStylesSet 을 추가하고 RouteLineOptions 생성하기
-                val options = RouteLineOptions.from(segment).setStylesSet(stylesSet)
-
-                // 5. RouteLineLayer 에 추가하여 RouteLine 생성하기
-                val routeLine = layer.addRouteLine(options)
+//                val segment = RouteLineSegment.from(
+//                    Arrays.asList(
+//                        LatLng.from(37.394660, 127.111182),
+//                        LatLng.from(37.33856778190988, 127.093663107081)
+//                    )
+//                ).setStyles(stylesSet.getStyles(0))
+//
+//                // // 3-2. id 를 통해 RouteLineStylesSet 에 있는 styles 를 가져온다.
+//                // RouteLineSegment segment = RouteLineSegment.from(Arrays.asList(
+//                //                 LatLng.from(37.338549743448546,127.09368565409382),
+//                //                 LatLng.from(37.33856778190988,127.093663107081)))
+//                //         .setStyles(stylesSet.getStyles("blueStyles"));
+//
+//                // 4. RouteLineStylesSet 을 추가하고 RouteLineOptions 생성하기
+//                val options = RouteLineOptions.from(segment).setStylesSet(stylesSet)
+//
+//                // 5. RouteLineLayer 에 추가하여 RouteLine 생성하기
+//                val routeLine = layer.addRouteLine(options)
 
                 /*------------------------------------------------------------------------------------*/
                 //화면상 좌상단 지도 좌표 얻어오기
@@ -216,7 +226,7 @@ class createGuideMainActivity  : AppCompatActivity() {
             val cameraPosition = camera.position
             x = cameraPosition.latitude
             y = cameraPosition.longitude
-//            Toast.makeText( applicationContext, "${x}\n${y}", Toast.LENGTH_LONG).show()
+            Toast.makeText( applicationContext, "${x}\n${y}", Toast.LENGTH_LONG).show()
         } else {
             x = 0.0; y = 0.0
         }
@@ -225,12 +235,33 @@ class createGuideMainActivity  : AppCompatActivity() {
 
     fun drawLine(po1 : LatLng, po2 : LatLng, styleIndex : Int) {
         //입력된 두 좌표를 연결
-        val segment = RouteLineSegment.from(
-            Arrays.asList( po1, po2)
-        ).setStyles(stylesSet.getStyles(styleIndex))
-        //Toast.makeText(applicationContext, "${po1.longitude}\n${po1.latitude}", Toast.LENGTH_LONG).show()
-        //Toast.makeText(applicationContext, "${po2.longitude}\n${po2.latitude}", Toast.LENGTH_LONG).show()
-        val options = RouteLineOptions.from(segment).setStylesSet(stylesSet)
+
+
+//        public val stylesSet: RouteLineStylesSet = RouteLineStylesSet.from(
+//            "blue", RouteLineStyles.from(RouteLineStyle.from(16f, Color.BLUE))
+//        )
+//        val segment = RouteLineSegment.from(
+//            Arrays.asList( po1, po2)
+//        ).setStyles(stylesSet.getStyles(styleIndex))
+//        //Toast.makeText(applicationContext, "${po1.longitude}\n${po1.latitude}", Toast.LENGTH_LONG).show()
+//        //Toast.makeText(applicationContext, "${po2.longitude}\n${po2.latitude}", Toast.LENGTH_LONG).show()
+//        //val options = RouteLineOptions.from(segment).setStylesSet(stylesSet)
+//
+
+        val options: RouteLineOptions = RouteLineOptions.from(
+            Arrays.asList(
+                RouteLineSegment.from(
+                    Arrays.asList( po1, po2),
+                    RouteLineStyle.from(
+                        baseContext,
+                        R.style.BlueRouteArrowLineStyle
+                    )
+                )
+            )
+        )
+
+        //multiStyleLine = layer.addRouteLine(options)
+
 
         // 5. RouteLineLayer 에 추가하여 RouteLine 생성하기
         val routeLine = layer.addRouteLine(options)
