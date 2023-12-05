@@ -7,6 +7,7 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.map.loadguied_v2.apiPackage.*
 import com.map.loadguied_v2.createGuide.createGuideMainActivity
+import com.map.loadguied_v2.recyleView.getAddress
 
 import kotlinx.coroutines.*
 
@@ -32,6 +33,16 @@ class MainActivity : AppCompatActivity() {
 
             //Toast.makeText(applicationContext, "클릭이벤트", Toast.LENGTH_SHORT).show()
         }
+        var loadGuide_Btn = findViewById<Button>(R.id.loadGuide_Btn)
+        loadGuide_Btn.setOnClickListener {
+            Log.d("불러오기 버튼","시도")
+            val intent = Intent(this, getAddress::class.java)
+            startActivity(intent)
+
+            Log.d("불러오기 버튼","성공")
+        }
+
+
 //        val JSON = "application/json; charset=utf-8".toMediaTypeOrNull()
 //        var url = "https://apis-navi.kakaomobility.com/v1/waypoints/directions"
 //        val client = OkHttpClient()
