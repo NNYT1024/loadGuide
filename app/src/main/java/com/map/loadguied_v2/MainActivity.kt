@@ -1,15 +1,25 @@
 package com.map.loadguied_v2
 
 import android.content.Intent
+import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Base64
 import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import com.map.loadguied_v2.apiPackage.*
+import com.map.loadguied_v2.apiPackage.callApi
+import com.map.loadguied_v2.apiPackage.findAddress_Json
 import com.map.loadguied_v2.createGuide.createGuideMainActivity
 import com.map.loadguied_v2.recyleView.getAddress
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
 
-import kotlinx.coroutines.*
 
 class MainActivity : AppCompatActivity() {
     val apiCaller = callApi()
@@ -91,6 +101,24 @@ class MainActivity : AppCompatActivity() {
         }
         //findAddress_Json(apiCaller.getAddress("망우3동"))
 //        apiCaller.getAddress("망우3동")
+        /*
+        //해시키 가져오기
+        var packageInfo: PackageInfo? = null
+        try {
+            packageInfo = packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
+        } catch (e: PackageManager.NameNotFoundException) {
+            e.printStackTrace()
+        }
+        if (packageInfo == null) Log.e("KeyHash", "KeyHash:null")
 
+        for (signature in packageInfo!!.signatures) {
+            try {
+                val md = MessageDigest.getInstance("SHA")
+                md.update(signature.toByteArray())
+                Log.d("KeyHash", Base64.encodeToString(md.digest(), Base64.DEFAULT))
+            } catch (e: NoSuchAlgorithmException) {
+                Log.e("KeyHash", "Unable to get MessageDigest. signature=$signature", e)
+            }
+        }*/
     }
 }
