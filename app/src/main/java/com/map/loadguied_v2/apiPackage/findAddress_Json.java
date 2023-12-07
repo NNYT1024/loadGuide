@@ -164,21 +164,21 @@ public class findAddress_Json {//주소검색 반환값 정리
     }
 
     public class document{
-        String address_name; //[필수]전체 지번 주소 또는 전체 도로명 주소. 입력에 따라 결정됨
-        String address_type; //[필수]address_name의 값의 타입(Type). REGION(지명), ROAD(도로명), REGION_ADDR(지번 주소), ROAD_ADDR (도로명 주소) 중 하나
+        String place_name; //[필수]전체 지번 주소 또는 전체 도로명 주소. 입력에 따라 결정됨
+        String road_address_name; //[필수]address_name의 값의 타입(Type). REGION(지명), ROAD(도로명), REGION_ADDR(지번 주소), ROAD_ADDR (도로명 주소) 중 하나
         String x; //[필수]X 좌표값, 경위도인 경우 longitude (경도)
         String y; //[필수]Y 좌표값, 경위도인 경우 latitude (위도)
 
         public document(JSONObject obj) {
 
             try{
-                setAddress_name(obj.getString("address_name"));
-                setAddress_type(obj.getString("address_type"));
+                setPlace_name(obj.getString("place_name"));
+                setRoad_address_name(obj.getString("road_address_name"));
                 setX(obj.getString("x"));
                 setY(obj.getString("y"));
             } catch (JSONException e) {
-                setAddress_name("none");
-                setAddress_type("none");
+                setPlace_name("none");
+                setRoad_address_name("none");
                 setX("-1.0");
                 setY("-1.0");
                 //throw new RuntimeException(e);
@@ -186,35 +186,35 @@ public class findAddress_Json {//주소검색 반환값 정리
             Log.d("document 생성자",toString());
         }
         public document() {
-            setAddress_name("none");
-            setAddress_type("none");
+            setRoad_address_name("none");
+            setPlace_name("none");
             setX("-1.0");
             setY("-1.0");
         }
         @Override
         public String toString() {
             return "document{" +
-                    "address_name='" + address_name + '\'' +
-                    ", address_type='" + address_type + '\'' +
+                    "place_name='" + place_name + '\'' +
+                    ", address_type='" + road_address_name + '\'' +
                     ", x='" + x + '\'' +
                     ", y='" + y + '\'' +
                     '}';
         }
 
-        public String getAddress_name() {
-            return address_name;
+        public String getPlace_name() {
+            return place_name;
         }
 
-        public void setAddress_name(String address_name) {
-            this.address_name = address_name;
+        public void setPlace_name(String address_name) {
+            this.place_name = address_name;
         }
 
-        public String getAddress_type() {
-            return address_type;
+        public String getRoad_address_name() {
+            return road_address_name;
         }
 
-        public void setAddress_type(String address_type) {
-            this.address_type = address_type;
+        public void setRoad_address_name(String address_type) {
+            this.road_address_name = address_type;
         }
 
         public String getX() {
