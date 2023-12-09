@@ -128,11 +128,34 @@ class callApi {
                 if (!response.isSuccessful) throw IOException("Unexpected code $response")
                 response.body?.string() ?: ""
             }
-            
+
         } catch (e: IOException) {
             e.printStackTrace()
             ""
         }
-        
+
+    }
+
+    suspend fun getAddressList(address: String): String = withContext(Dispatchers.IO) {
+        val url = "https://dapi.kakao.com/v2/local/search/keyword.json"
+
+        val client = OkHttpClient()
+
+        val request = Request.Builder()
+            .url("$url?query=${URLEncoder.encode(address, "UTF-8")}")
+            .header("Authorization", "KakaoAK $REST_API_KEY")
+            .build()
+
+        return@withContext try {
+            client.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) throw IOException("Unexpected code $response")
+                response.body?.string() ?: ""
+            }
+
+        } catch (e: IOException) {
+            e.printStackTrace()
+            ""
+        }
+
     }
 }
