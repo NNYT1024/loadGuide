@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">loadGuied_v2</string>
+    <string name="title_activity_get_address">getAddressActivity</string>
 </resources>
